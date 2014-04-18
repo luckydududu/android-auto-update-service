@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aus__is_latest_version_label">您的应用已是最新版本</string>
+    <string name="aus__error_check_update">检查新版本出现错误，请稍候再试</string>
+    <string name="aus__has_new_version_label">您的应用还不是最新版本，请及时更新&#8230;</string>
+    <string name="aus__network_not_activated">无法连接网络，请您检查后重试…</string>
+    <string name="aus__network_error">连接网络错误，请您检查后重试…</string>
+    <string name="aus__check_new_version">开始检测新版本</string>
+    <string name="aus__sdcard_not_mounted">外部存储暂不可用，暂时不能升级</string>
+    <string name="aus__latest_version_title">最新版本(%1$s)</string>
+    <string name="aus__latest_version_time">版本发布时间：%1$s</string>
+    <string name="aus__later_on_wifi">稍候在Wifi下更新</string>
+    <string name="aus__update">更新</string>
+    <string name="aus__ignore">忽略</string>
+    
+    <string name="download_failure">下载最新版本失败!</string>
+    <string name="apk_file_not_exists">Apk 文件不存在 !</string>
+    <string name="apk_file_invalid">Apk文件下载出错，请重新下载</string>
+    <string name="update_latest_version_title">最新版本可用(%1$s), 更新中&#8230;</string>
+    <string name="later_update_tip">更新中&#8230; (您在非Wifi环境下提交了此更新任务)</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="aus__has_new_version_label">Your app is not the latest version，please update&#8230;</string>
+    <string name="aus__is_latest_version_label">Your app is the latest version</string>
+    <string name="aus__latest_version_time">Release time: %1$s</string>
+    <string name="aus__network_not_activated">Can not connect to server,please retry again…</string>
+    <string name="aus__network_error">Connect to server has error, please retry again…</string>
+    <string name="aus__check_new_version">Start to check the new version</string>
+    <string name="aus__sdcard_not_mounted">External storage unavailable，can not upgrade temporarily</string>
+    <string name="aus__latest_version_title">Latest version available(%1$s)</string>
+    <string name="aus__update">Update</string>
+    <string name="aus__ignore">Ignore</string>
+    
+    <string name="apk_file_not_exists">Apk file not exists !</string>
+    <string name="download_failure">Download latest version failure !</string>
+    <string name="apk_file_invalid">Apk file is invalid,please re-download it</string>
+    <string name="update_latest_version_title">Latest version available(%1$s), updating&#8230;</string>
+    <string name="aus__later_on_wifi">Auto Update later when on wifi</string>
+    <string name="later_update_tip">Updating&#8230; (Submited when you\'r NOT on Wifi)</string>
+
+</resources>
