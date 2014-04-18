@@ -12,6 +12,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.text.TextUtils;
 
+import com.yepstudio.android.service.autoupdate.AutoUpdateLog;
+import com.yepstudio.android.service.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.service.autoupdate.CheckFileDelegate;
 import com.yepstudio.android.service.autoupdate.Version;
 
@@ -24,12 +26,15 @@ import com.yepstudio.android.service.autoupdate.Version;
  * 
  */
 public class SignatureCheckFileDelegate implements CheckFileDelegate {
+	
+	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(SignatureCheckFileDelegate.class); 
 
 	@Override
 	public boolean doCheck(String module, Context context, Version version, File file) {
 		if (file == null || !file.exists()) {
 			return false;
 		}
+		log.trace("doCheck : " + file.getAbsolutePath());
 		String dexPath = file.getAbsolutePath();
 		PackageInfo info = context.getPackageManager().getPackageArchiveInfo(dexPath, PackageManager.GET_SIGNATURES);
 		if (info == null) {
@@ -37,20 +42,20 @@ public class SignatureCheckFileDelegate implements CheckFileDelegate {
 		}
 		Signature[] apkSigns = info.signatures;
 		String apkMD5 = getSignatureMD5(apkSigns);
+		log.debug("download apk Signature MD5 : " + apkMD5);
 
 		PackageManager pm = context.getPackageManager();
 		PackageInfo packageInfo = null;
 		try {
-			packageInfo = pm.getPackageInfo(context.getPackageName(),
-					PackageManager.GET_SIGNATURES);
+			packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
 		} catch (NameNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		Signature[] selfSigns = packageInfo.signatures;
-
 		String selfMd5 = getSignatureMD5(selfSigns);
-		TextUtils.equals(apkMD5, selfMd5);
-		return false;
+		log.debug("self Signature MD5 : " + selfMd5);
+		
+		return TextUtils.equals(apkMD5, selfMd5);
 	}
 
 	public static String getSignatureMD5(Signature[] signs) {

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.yepstudio.android.service.autoupdate.AutoUpdateLog;
+import com.yepstudio.android.service.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.service.autoupdate.CheckFileDelegate;
 import com.yepstudio.android.service.autoupdate.Version;
 
@@ -18,6 +20,8 @@ import com.yepstudio.android.service.autoupdate.Version;
  * 
  */
 public class PackageCheckFileDelegate implements CheckFileDelegate {
+	
+	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(PackageCheckFileDelegate.class);
 
 	@Override
 	public boolean doCheck(String module, Context context, Version version, File file) {
@@ -26,6 +30,7 @@ public class PackageCheckFileDelegate implements CheckFileDelegate {
 		}
 		String dexPath = file.getAbsolutePath();
 		PackageInfo info = context.getPackageManager().getPackageArchiveInfo(dexPath, PackageManager.GET_SIGNATURES);
+		log.debug("app PackageName=" + context.getPackageName() + ", APK packageName = " + info.packageName);
 		return info != null && context.getPackageName().equals(info.packageName);
 	}
 

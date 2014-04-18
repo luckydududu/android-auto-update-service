@@ -2,6 +2,13 @@ package com.yepstudio.android.service.autoupdate.internal;
 
 import com.yepstudio.android.service.autoupdate.AutoUpdateLog;
 
+/**
+ * 
+ * @author zhangzl@gmail.com
+ * @create 2014年4月18日
+ * @version 1.0, 2014年4月18日
+ *
+ */
 public class Sl4fLog implements AutoUpdateLog {
 
 	@Override

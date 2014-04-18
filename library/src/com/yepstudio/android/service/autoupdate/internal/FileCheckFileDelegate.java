@@ -10,6 +10,8 @@ import java.security.NoSuchAlgorithmException;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.yepstudio.android.service.autoupdate.AutoUpdateLog;
+import com.yepstudio.android.service.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.service.autoupdate.CheckFileDelegate;
 import com.yepstudio.android.service.autoupdate.Version;
 
@@ -21,18 +23,23 @@ import com.yepstudio.android.service.autoupdate.Version;
  *
  */
 public class FileCheckFileDelegate implements CheckFileDelegate {
+	
+	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(FileCheckFileDelegate.class);
 
 	@Override
 	public boolean doCheck(String module, Context context, Version version, File file) {
 		if (!TextUtils.isEmpty(version.getMD5())) {
 			String md5 = getAlgorithmOfFile(file, "MD5");
+			log.debug("version.getMD5() = " + version.getMD5() + " ,  file MD5 = " + md5);
 			return TextUtils.equals(md5, version.getMD5());
 		}
 		if (!TextUtils.isEmpty(version.getSHA1())) {
-			String md5 = getAlgorithmOfFile(file, "SHA-1");
-			return TextUtils.equals(md5, version.getSHA1());
+			String sha1 = getAlgorithmOfFile(file, "SHA-1");
+			log.debug("version.getSHA1() = " + version.getSHA1() + " ,  file MD5 = " + sha1);
+			return TextUtils.equals(sha1, version.getSHA1());
 		}
-		return false;
+		log.trace("doCheck, no MD5, no SHA-1, so pass : " + file.getAbsolutePath());
+		return true;
 	}
 	
 	public static String getAlgorithmOfFile(File file, String algorithm) {

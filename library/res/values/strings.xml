@@ -11,10 +11,12 @@
     <string name="aus__latest_version_title">Latest version available(%1$s)</string>
     <string name="aus__update">Update</string>
     <string name="aus__ignore">Ignore</string>
+    <string name="aus__apk_file_invalid">Apk file is invalid,please re-download it</string>
+    <string name="aus__apk_file_start_valldate">Apk file is download successed, start check apk file....</string>
     
     <string name="apk_file_not_exists">Apk file not exists !</string>
+    
     <string name="download_failure">Download latest version failure !</string>
-    <string name="apk_file_invalid">Apk file is invalid,please re-download it</string>
     <string name="update_latest_version_title">Latest version available(%1$s), updating&#8230;</string>
     <string name="aus__later_on_wifi">Auto Update later when on wifi</string>
     <string name="later_update_tip">Updating&#8230; (Submited when you\'r NOT on Wifi)</string>

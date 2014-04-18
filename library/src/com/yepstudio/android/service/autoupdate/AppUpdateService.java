@@ -46,6 +46,9 @@ public class AppUpdateService {
 		if (configurationMap == null) {
 			configurationMap = new ConcurrentHashMap<String, AppUpdateServiceConfiguration>(3);
 		}
+		if (configurationMap.get(module) != null) {
+			throw new IllegalArgumentException("AppUpdateService init just one time.");
+		}
 		config.setModule(module);
 		configurationMap.put(module, config);
 	}
