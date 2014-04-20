@@ -13,6 +13,10 @@
     <string name="aus__ignore">Ignore</string>
     <string name="aus__apk_file_invalid">Apk file is invalid,please re-download it</string>
     <string name="aus__apk_file_start_valldate">Apk file is download successed, start check apk file....</string>
+    <string name="aus__update_version_just_in_wifi">update Task commit, task will auto execute when has wifi</string>
+    <string name="aus__start_download">start download&#8230;</string>
+    <string name="aus__start_install">start install &#8230;</string>
+    <string name="aus__update_downloading">update file is downloading&#8230;</string>
     
     <string name="apk_file_not_exists">Apk file not exists !</string>
     

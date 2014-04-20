@@ -61,17 +61,21 @@ public class SimpleDisplayDelegate implements DisplayDelegate {
         View ignore = dialog.findViewById(R.id.ignore);
         View update = dialog.findViewById(R.id.update);
 
-        UpdatePolicy updatePolicy = AppUpdateService.getConfiguration(module).getUpdatePolicy();
+        UpdatePolicy updatePolicy = version.getUpdatePolicy();
+		if (updatePolicy == null) {
+			AppUpdateService.getConfiguration(module).getUpdatePolicy();
+		}
         
         final CheckBox laterOnWifi = (CheckBox) dialog.findViewById(R.id.only_wifi);
         //非Wifi情况下
 		if (NetworkUtil.getNetworkType(context) != NetworkUtil.WIFI) {
 			//判断更新策略
-			if (!updatePolicy.isHasUpdateInWifi()) {
-				log.info("isHasUpdateInWifi : true, so not show UpdateInWifi");
-				laterOnWifi.setVisibility(View.GONE);
-			} else {
+			if (updatePolicy.isHasUpdateInWifi()) {
+				log.debug("isHasUpdateInWifi : true, so show UpdateInWifi");
 				laterOnWifi.setVisibility(View.VISIBLE);
+			} else {
+				log.debug("isHasUpdateInWifi : false, so not show UpdateInWifi");
+				laterOnWifi.setVisibility(View.GONE);
 			}
 			//判断更新策略是否自动打开WIFI
 			if (updatePolicy.isAutoOpenWifi()) {

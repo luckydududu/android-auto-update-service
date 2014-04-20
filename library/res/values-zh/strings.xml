@@ -14,6 +14,10 @@
     <string name="aus__ignore">忽略</string>
     <string name="aus__apk_file_invalid">下载的Apk文件不正确，请重新下载</string>
     <string name="aus__apk_file_start_valldate">Apk文件下载成功，正在安全校验&#8230;</string>
+    <string name="aus__update_version_just_in_wifi">更新任务已提交，连接到WIFI的时候将会自动执行更新任务</string>
+    <string name="aus__start_download">开始下载更新文件&#8230;</string>
+    <string name="aus__start_install">开始安装更新文件&#8230;</string>
+    <string name="aus__update_downloading">更新文件正在下载，请稍候&#8230;</string>
     
     <string name="download_failure">下载最新版本失败!</string>
     <string name="apk_file_not_exists">Apk 文件不存在 !</string>

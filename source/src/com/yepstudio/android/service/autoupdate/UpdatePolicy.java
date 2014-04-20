@@ -1,6 +1,11 @@
 package com.yepstudio.android.service.autoupdate;
 
 import java.io.Serializable;
+import java.util.Date;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.text.format.DateUtils;
 
 /**
  * 更新策略
@@ -11,6 +16,7 @@ import java.io.Serializable;
  */
 public class UpdatePolicy implements Serializable {
 	
+	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(UpdatePolicy.class);
 	private static final long serialVersionUID = -3662004012924347765L;
 	
 	/*** 是否忽略自动升级的版本 ***/
@@ -31,15 +37,46 @@ public class UpdatePolicy implements Serializable {
 		 * @param isAutoUpdate
 		 * @return
 		 */
-		public boolean isIgnore(Version version, boolean isAutoUpdate);
+		public boolean isIgnore(Context context, Version version, boolean isAutoUpdate);
+		
+		/**
+		 * 
+		 * @param module
+		 * @param context
+		 * @param version
+		 */
+		public void notifyIgnore(Context context, Version version);
 
 	}
 
 	public static IgnorePolicy TODAY_NO_SHOW = new IgnorePolicy() {
+		
+		private static final String SAVE_NAME = "TODAY_NO_SHOW";
 
 		@Override
-		public boolean isIgnore(Version version, boolean isAutoUpdate) {
-			return false;
+		public boolean isIgnore(Context context, Version version, boolean isAutoUpdate) {
+			boolean result = false;
+			if (isAutoUpdate) {
+				SharedPreferences sp = getSharedPreferences(context);
+				long time = sp.getLong(version.getUniqueIdentity(), 0L);
+				result = DateUtils.isToday(time);
+			}
+			log.debug("IgnorePolicy TODAY_NO_SHOW, isAutoUpdate=" + isAutoUpdate + ", isIgnore=" + result);
+			return result;
+		}
+
+		@Override
+		public void notifyIgnore(Context context, Version version) {
+			log.debug("IgnorePolicy TODAY_NO_SHOW  be notifyIgnore, member today Ignore this version.");
+			SharedPreferences sp = getSharedPreferences(context);
+			sp.edit().putLong(version.getUniqueIdentity(), new Date().getTime()).commit();
+		}
+		
+		private SharedPreferences getSharedPreferences(Context context) {
+			if (context != null) {
+				return context.getApplicationContext().getApplicationContext().getSharedPreferences(SAVE_NAME, Context.MODE_PRIVATE);
+			}
+			return null;
 		}
 
 	};
@@ -47,8 +84,15 @@ public class UpdatePolicy implements Serializable {
 	public static IgnorePolicy JUST_THIS_LAUNCHER = new IgnorePolicy() {
 
 		@Override
-		public boolean isIgnore(Version version, boolean isAutoUpdate) {
+		public boolean isIgnore(Context context, Version version, boolean isAutoUpdate) {
+			log.debug("IgnorePolicy : JUST_THIS_LAUNCHER, do not Ignore.");
 			return false;
+		}
+
+		@Override
+		public void notifyIgnore(Context context, Version version) {
+			//do nothing
+			log.debug("IgnorePolicy : JUST_THIS_LAUNCHER, notifyIgnore, but do nothing.");
 		}
 
 	};

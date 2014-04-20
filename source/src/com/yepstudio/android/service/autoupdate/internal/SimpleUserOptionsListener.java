@@ -3,8 +3,6 @@ package com.yepstudio.android.service.autoupdate.internal;
 import java.io.File;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -15,6 +13,7 @@ import com.yepstudio.android.service.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.service.autoupdate.CheckFileDelegate;
 import com.yepstudio.android.service.autoupdate.DownloadDelegate;
 import com.yepstudio.android.service.autoupdate.R;
+import com.yepstudio.android.service.autoupdate.UpdatePolicy;
 import com.yepstudio.android.service.autoupdate.UserOptionsListener;
 import com.yepstudio.android.service.autoupdate.Version;
 
@@ -49,20 +48,26 @@ public class SimpleUserOptionsListener implements UserOptionsListener {
 					}
 					
 				};
-				if (!delegate.download(module, context, version, callback)) {
+				if (!delegate.download(module, context, version, callback, true)) {
 					log.warning("download fail, use BrowserDownloadDelegate to download.");
-					new BrowserDownloadDelegate().download(module, context, version, null);
+					new BrowserDownloadDelegate().download(module, context, version, null, false);
 				}
 			}
-
 		} else {
-			new VersionPersistent(context).save(version);
+			config.getVersionPersistent().save(module, context, version);
+			Toast.makeText(context, R.string.aus__update_version_just_in_wifi, Toast.LENGTH_LONG).show();
 		}
 	}
 
 	@Override
 	public void doIgnore(String module, Context context, Version version) {
 		log.info("doIgnore");
+		AppUpdateServiceConfiguration config = AppUpdateService.getConfiguration(module);
+		UpdatePolicy updatePolicy = version.getUpdatePolicy();
+		if (updatePolicy == null) {
+			updatePolicy = config.getUpdatePolicy();
+		}
+		updatePolicy.getIgnorePolicy().notifyIgnore(context, version);
 	}
 	
 	private void checkAndInstallApk(final AppUpdateServiceConfiguration config, final Context context, final Version version, final File apk) {
@@ -84,7 +89,7 @@ public class SimpleUserOptionsListener implements UserOptionsListener {
 			protected void onPostExecute(Boolean result) {
 				if (result != null && result == true) {
 					log.info("download success, CheckFile success, start install...");
-					installAPK(context, apk);
+					installAPK(config, context, apk);
 				} else {
 					if (apk != null) {
 						if (!apk.delete()) {
@@ -101,13 +106,10 @@ public class SimpleUserOptionsListener implements UserOptionsListener {
 		Toast.makeText(context, R.string.aus__apk_file_start_valldate, Toast.LENGTH_LONG).show();
 	}
 	
-	private void installAPK(Context context, File apk) {
+	private void installAPK(AppUpdateServiceConfiguration config, Context context, File apk) {
 		log.info("installAPK : " + apk.getAbsolutePath());
-		Intent installIntent = new Intent();
-		installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		installIntent.setAction(android.content.Intent.ACTION_VIEW);
-		installIntent.setDataAndType(Uri.fromFile(apk), "application/vnd.android.package-archive");
-		context.startActivity(installIntent);
+		Toast.makeText(context, R.string.aus__start_install, Toast.LENGTH_LONG).show();
+		config.getInstallExecutor().install(config.getModule(), context, apk);
 	}
 
 }

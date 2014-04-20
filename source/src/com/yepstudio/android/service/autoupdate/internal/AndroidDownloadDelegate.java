@@ -41,11 +41,16 @@ public class AndroidDownloadDelegate extends BroadcastReceiver implements Downlo
 	private Map<String, Runnable> callbackMap = new HashMap<String, Runnable>();
 	
 	@Override
-	public boolean download(String module, Context context, Version version, Runnable callback) {
+	public boolean download(String module, Context context, Version version, Runnable callback, boolean isUserOpt) {
 		if (!canUseSDCard()) {
 			log.warning("can not Use SDCard, so stop download and toast.");
-			Toast.makeText(context, R.string.aus__sdcard_not_mounted, Toast.LENGTH_SHORT).show();
+			if (isUserOpt) {
+				Toast.makeText(context, R.string.aus__sdcard_not_mounted, Toast.LENGTH_SHORT).show();
+			}
 			return false;
+		}
+		if (isUserOpt) {
+			Toast.makeText(context, R.string.aus__start_download, Toast.LENGTH_LONG).show();
 		}
 		
 		DownloadManager downloader = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);

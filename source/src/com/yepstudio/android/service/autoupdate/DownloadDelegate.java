@@ -22,7 +22,7 @@ public interface DownloadDelegate {
    * @param callback
    * @return 是否接收了该文件的下载
    */
-	public boolean download(String module, Context context, Version version, Runnable callback);
+	public boolean download(String module, Context context, Version version, Runnable callback, boolean isUserOpt);
 	
 	/**
 	 * 是否正在下载

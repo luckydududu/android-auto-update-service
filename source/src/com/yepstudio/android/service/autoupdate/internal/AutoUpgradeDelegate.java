@@ -66,13 +66,15 @@ public class AutoUpgradeDelegate implements AppUpdate {
 
 	protected boolean canStartUpdateCheck(AppUpdateServiceConfiguration config, Context context, boolean isAutoUpdate) {
 		log.trace("canStartUpdateCheck...");
-		if (!NetworkUtil.hasNetwork(context)) {
+		if (!NetworkUtil.hasNetwork(context)) {//没有网络，则直接提示不能升级
 			log.trace("has not Network stop UpdateCheck.");
 			if (!isAutoUpdate) {
 				String tip = config.getTip(AppUpdateServiceConfiguration.TIP_KEY_NETWORKNOTACTIVATED);
 				showToast(context, tip, Toast.LENGTH_LONG);
 			}
 			return false;
+		} else {//有网络
+			
 		}
 		return true;
 	}
@@ -113,6 +115,10 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		} else {
 			log.info("response isEmpty, no Version to Update");
 		}
+		if (version != null) {
+			log.debug("find new version, setModule : " + config.getModule());
+			version.setModule(config.getModule());
+		}
 		
 		return version;
 	}
@@ -121,7 +127,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		log.trace("processUpdatePolicyOfServer");
 		// 判断是否忽略服务器返回的更新策略
 		if (version != null && config.ignoreServerPolicy()) {
-			log.info("ignoreServerPolicy");
+			log.info("find new version, ignoreServerPolicy, so version.setUpdatePolicy from config.getUpdatePolicy");
 			version.setUpdatePolicy(config.getUpdatePolicy());
 		}
 		return version;

@@ -14,8 +14,10 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.yepstudio.android.service.autoupdate.internal.AndroidDownloadDelegate;
+import com.yepstudio.android.service.autoupdate.internal.ApkInstallExecutor;
 import com.yepstudio.android.service.autoupdate.internal.BrowserDownloadDelegate;
-import com.yepstudio.android.service.autoupdate.internal.PackageCheckFileDelegate;
+import com.yepstudio.android.service.autoupdate.internal.FileCheckFileDelegate;
+import com.yepstudio.android.service.autoupdate.internal.SharedPreferencesVersionPersistent;
 import com.yepstudio.android.service.autoupdate.internal.SimpleDisplayDelegate;
 import com.yepstudio.android.service.autoupdate.internal.SimpleJSONParser;
 import com.yepstudio.android.service.autoupdate.internal.SimpleResponseDelivery;
@@ -49,8 +51,10 @@ public class AppUpdateServiceConfiguration {
 	private UserOptionsListener userOptionsListener;
 	private DownloadDelegate downloadDelegate;
 	private CheckFileDelegate checkFileDelegate;
+	private VersionPersistent versionPersistent;
 	private UpdatePolicy updatePolicy;
-	
+	private InstallExecutor installExecutor;
+
 	/*** 是否忽略服务器返回的更新策略 ***/
 	private boolean ignoreServerPolicy = false;
 	/*** 是否忽略Sim卡的信息 ***/
@@ -76,6 +80,8 @@ public class AppUpdateServiceConfiguration {
 	public static final String TIP_KEY_IS_LATEST_VERSION_LABEL = "aus__is_latest_version_label";
 	/***有新版本的提示**/
 	public static final String TIP_KEY_HAS_NEW_VERSION_LABEL = "aus__has_new_version_label";
+	/***有新版本的提示**/
+	public static final String TIP_KEY_NEW_VERSION_DOWNLOADING = "tip_key_new_version_downloading";
 	
 	
 	public static final String PARAM_WIDTH = "width";
@@ -167,6 +173,10 @@ public class AppUpdateServiceConfiguration {
 		return updatePolicy;
 	}
 	
+	public VersionPersistent getVersionPersistent() {
+		return versionPersistent;
+	}
+	
 	public boolean ignoreServerPolicy() {
 		return ignoreServerPolicy;
 	}
@@ -184,6 +194,10 @@ public class AppUpdateServiceConfiguration {
 	
 	public ResponseDelivery getResponseDelivery() {
 		return responseDelivery;
+	}
+	
+	public InstallExecutor getInstallExecutor() {
+		return installExecutor;
 	}
 
 	public static class Build {
@@ -282,6 +296,16 @@ public class AppUpdateServiceConfiguration {
 			return this;
 		}
 		
+		public Build setVersionPersistent(VersionPersistent versionPersistent) {
+			config.versionPersistent = versionPersistent;
+			return this;
+		}
+		
+		public Build setInstallExecutor(InstallExecutor installDelegate) {
+			config.installExecutor = installDelegate;
+			return this;
+		}
+		
 		public AppUpdateServiceConfiguration create(Context context) {
 			if (TextUtils.isEmpty(config.updateUrl)) {
 				throw new IllegalArgumentException("AppUpdateServiceConfiguration create fail. updateUrl need be set. setCheckUpdateUrl");
@@ -327,7 +351,7 @@ public class AppUpdateServiceConfiguration {
 				log.trace("use default DownloadDelegate : " + config.downloadDelegate);
 			}
 			if (config.checkFileDelegate == null) {
-				setCheckFileDelegate(new PackageCheckFileDelegate());
+				setCheckFileDelegate(new FileCheckFileDelegate());
 				log.trace("use default CheckFileDelegate : " + config.checkFileDelegate);
 			}
 			if (useDefaultRequestParams) {
@@ -337,6 +361,14 @@ public class AppUpdateServiceConfiguration {
 			if (config.updatePolicy == null) {
 				setUpdatePolicy(new UpdatePolicy());
 				log.trace("default is UpdatePolicy : " + config.updatePolicy);
+			}
+			if (config.versionPersistent == null) {
+				setVersionPersistent(new SharedPreferencesVersionPersistent());
+				log.trace("default is versionPersistent : " + config.versionPersistent);
+			}
+			if (config.installExecutor == null) {
+				setInstallExecutor(new ApkInstallExecutor());
+				log.trace("default is InstallExecutor : " + config.installExecutor);
 			}
 			return config;
 		}
@@ -417,6 +449,7 @@ public class AppUpdateServiceConfiguration {
 			setTipIfEmpty(TIP_KEY_PARSER_ERROR, context, R.string.aus__error_check_update);
 			setTipIfEmpty(TIP_KEY_IS_LATEST_VERSION_LABEL, context, R.string.aus__is_latest_version_label);
 			setTipIfEmpty(TIP_KEY_HAS_NEW_VERSION_LABEL, context, R.string.aus__has_new_version_label);
+			setTipIfEmpty(TIP_KEY_NEW_VERSION_DOWNLOADING, context, R.string.aus__update_downloading);
 		}
 		
 		@TargetApi(android.os.Build.VERSION_CODES.GINGERBREAD)

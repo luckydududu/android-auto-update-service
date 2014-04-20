@@ -87,7 +87,7 @@ public class AppUpdateService {
 			config.addRequestParam(AppUpdateServiceConfiguration.PARAM_AUTOUPDATE, isAutoUpdate);
 			appUpdateMap.put(module, new SoftReference<AppUpdate>(appUpdate));
 		}
-		appUpdate.checkUpdate(module, context, isAutoUpdate);
+		appUpdate.checkUpdate(module, context.getApplicationContext(), isAutoUpdate);
 	}
 	
 	public static AppUpdateServiceConfiguration getConfiguration(String module) {
