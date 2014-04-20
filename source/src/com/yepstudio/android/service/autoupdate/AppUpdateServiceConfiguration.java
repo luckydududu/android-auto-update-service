@@ -38,6 +38,7 @@ public class AppUpdateServiceConfiguration {
 	
 	private String updateUrl;
 	private String userAgent;
+	private String method;
 	private Map<String, Object> requestParams;
 	private Map<String, String> tip;
 	private ResponseDelivery responseDelivery; 
@@ -126,6 +127,10 @@ public class AppUpdateServiceConfiguration {
 		return userAgent;
 	}
 	
+	public String getMethod() {
+		return method;
+	}
+	
 	public ResponseParser getResponseParser() {
 		return responseParser;
 	}
@@ -210,6 +215,11 @@ public class AppUpdateServiceConfiguration {
 			config.userAgent = userAgent;
 			return this;
 		}
+
+		public Build setMethod(String method) {
+			config.method = method;
+			return this;
+		}
 		
 		public Build setResponseCallback(ResponseListener responseListener) {
 			config.responseListener = responseListener;
@@ -279,6 +289,11 @@ public class AppUpdateServiceConfiguration {
 			if (TextUtils.isEmpty(config.userAgent)) {
 				setDefaultUserAgent(context);
 				log.trace("use default UserAgent : " + config.userAgent);
+			}
+			
+			if (TextUtils.isEmpty(config.method)) {
+				setMethod("GET");
+				log.trace("use default Method : " + config.method);
 			}
 			
 			setDefaultTips(context);

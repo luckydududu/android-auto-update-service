@@ -1,6 +1,9 @@
 package com.yepstudio.android.service.autoupdate;
 
+import android.util.Log;
+
 import com.yepstudio.android.service.autoupdate.internal.LogCatLog;
+import com.yepstudio.android.service.autoupdate.internal.Slf4jLog;
 
 /**
  * 
@@ -15,7 +18,15 @@ public class AutoUpdateLogFactory {
 
 	public static AutoUpdateLog getAutoUpdateLog(Class<?> clazz) {
 		if (LOGCLASS == null) {
-			LOGCLASS = LogCatLog.class;
+			try {
+				Class<?> slf4jClazz = Class.forName("org.slf4j.LoggerFactory");
+				if (slf4jClazz != null) {
+					LOGCLASS = Slf4jLog.class;
+					Log.i("AutoUpdateService", "find has Slf4j, use Slf4jLog for log.");
+				}
+			} catch (Throwable e) {
+				LOGCLASS = LogCatLog.class;
+			}
 		}
 		AutoUpdateLog log = null;
 		try {

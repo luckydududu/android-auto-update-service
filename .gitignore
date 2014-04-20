@@ -29,3 +29,6 @@ proguard/
 
 # MacOS 
 .DS_Store
+/source/.classpath
+/source/.project
+/source/.settings

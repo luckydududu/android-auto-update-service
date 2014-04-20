@@ -96,7 +96,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		log.trace("checkUpdateInTask...");
 		String response = null;
 		try {
-			response = config.getResponseDelivery().submitRequest(config.getUpdateUrl(), "GET", config.getUserAgent(), config.getRequestParams());
+			response = config.getResponseDelivery().submitRequest(config.getUpdateUrl(), config.getMethod(), config.getUserAgent(), config.getRequestParams());
 		} catch (Throwable exp) {
 			log.error("requestUpdateCheck error", exp);
 			responseError = true;

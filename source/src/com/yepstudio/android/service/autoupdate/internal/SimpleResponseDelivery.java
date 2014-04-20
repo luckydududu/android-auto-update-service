@@ -38,8 +38,8 @@ public class SimpleResponseDelivery implements ResponseDelivery {
 			builder.deleteCharAt(builder.length() - 1);
 		}
 		
-		URL targetUrl = new URL(updateUrl);
-		log.trace("updateUrl:" + updateUrl);
+		URL targetUrl = new URL(builder.toString());
+		log.trace("updateUrl:" + builder.toString());
 		
 		//设置UserAgent
 		HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
