@@ -32,3 +32,4 @@ proguard/
 /source/.classpath
 /source/.project
 /source/.settings
+/library/.settings
