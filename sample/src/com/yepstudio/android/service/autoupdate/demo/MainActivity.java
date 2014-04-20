@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
 		config.setResponseParser(new ResponseParser() {
 			
 			@Override
-			public Version parser(String module, String response) {
+			public Version parser(String response) {
 				Version version = new Version();
 				version.setApp(MainActivity.this.getPackageName());
 				version.setCode(2);

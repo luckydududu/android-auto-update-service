@@ -9,13 +9,16 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 
 import com.yepstudio.android.service.autoupdate.internal.AndroidDownloadDelegate;
 import com.yepstudio.android.service.autoupdate.internal.BrowserDownloadDelegate;
 import com.yepstudio.android.service.autoupdate.internal.PackageCheckFileDelegate;
 import com.yepstudio.android.service.autoupdate.internal.SimpleDisplayDelegate;
 import com.yepstudio.android.service.autoupdate.internal.SimpleJSONParser;
+import com.yepstudio.android.service.autoupdate.internal.SimpleResponseDelivery;
 import com.yepstudio.android.service.autoupdate.internal.SimpleResponseListener;
 import com.yepstudio.android.service.autoupdate.internal.SimpleUserOptionsListener;
 import com.yepstudio.android.service.autoupdate.internal.SimpleVersionCompare;
@@ -37,16 +40,28 @@ public class AppUpdateServiceConfiguration {
 	private String userAgent;
 	private Map<String, Object> requestParams;
 	private Map<String, String> tip;
+	private ResponseDelivery responseDelivery; 
 	private ResponseParser responseParser;
-	private VersionCompare versionCompare;
 	private ResponseListener responseListener;
+	private VersionComparer versionCompare;
 	private DisplayDelegate displayDelegate;
 	private UserOptionsListener userOptionsListener;
 	private DownloadDelegate downloadDelegate;
 	private CheckFileDelegate checkFileDelegate;
 	private UpdatePolicy updatePolicy;
+	
 	/*** 是否忽略服务器返回的更新策略 ***/
 	private boolean ignoreServerPolicy = false;
+	/*** 是否忽略Sim卡的信息 ***/
+	private boolean ignoreRequestSimInfo = false;
+	/*** 是否忽略网络信息 ***/
+	private boolean ignoreRequestNetworkInfo = false;
+	/*** 是否忽略手机和操作系统的信息 ***/
+	private boolean ignoreRequestOSInfo = false;
+	/*** 是否忽略App的信息 ***/
+	private boolean ignoreRequestAppInfo = false;
+	/*** 是否忽略分辨率的信息 ***/
+	private boolean ignoreRequestDisplayInfo = false;
 	
 	/***开始检查新版本的提示**/
 	public static final String TIP_KEY_CHECK_NEW_VERSION = "aus__check_new_version";
@@ -60,6 +75,39 @@ public class AppUpdateServiceConfiguration {
 	public static final String TIP_KEY_IS_LATEST_VERSION_LABEL = "aus__is_latest_version_label";
 	/***有新版本的提示**/
 	public static final String TIP_KEY_HAS_NEW_VERSION_LABEL = "aus__has_new_version_label";
+	
+	
+	public static final String PARAM_WIDTH = "width";
+	public static final String PARAM_HEIGHT = "height";
+	public static final String PARAM_DENSITY = "density";
+	public static final String PARAM_DENSITYDPI = "densitydip";
+	
+	public static final String PARAM_DEVICEID = "deviceId";
+	public static final String PARAM_PRODUCT = "product";
+	public static final String PARAM_MODEL = "model";
+	public static final String PARAM_BRAND = "brand";
+	public static final String PARAM_MANUFACTURER = "manufacturer";
+	
+	public static final String PARAM_OSNAME = "osName";
+	public static final String PARAM_SDKRELEASE = "sdkRelease";
+	public static final String PARAM_SDKVERSION = "sdkVersion";
+	
+	public static final String PARAM_NETWORK = "network";
+	
+	public static final String PARAM_PHONE = "phone";
+	public static final String PARAM_PHONETYPE = "phoneType";
+	public static final String PARAM_SIMCOUNTRY = "simCountry";
+	public static final String PARAM_SIM = "sim";
+	public static final String PARAM_SIMNAME = "simName";
+	public static final String PARAM_SIMCODE = "simCode";
+	
+	public static final String PARAM_APPTYPE = "appType";
+	public static final String PARAM_APP = "app";
+	public static final String PARAM_VERSIONNAME = "versionName";
+	public static final String PARAM_VERSIONCODE = "versionCode";
+	public static final String PARAM_DEBUG = "debug";
+	
+	public static final String PARAM_AUTOUPDATE = "autoUpdate";
 	
 	private AppUpdateServiceConfiguration() {
 		requestParams = new HashMap<String, Object>();
@@ -118,8 +166,19 @@ public class AppUpdateServiceConfiguration {
 		return ignoreServerPolicy;
 	}
 	
-	public VersionCompare getVersionCompare() {
+	public VersionComparer getVersionCompare() {
 		return versionCompare;
+	}
+	
+	public void addRequestParam(String key, Object value) {
+		if (requestParams == null) {
+			requestParams = new HashMap<String, Object>();
+		}
+		requestParams.put(key, value);
+	}
+	
+	public ResponseDelivery getResponseDelivery() {
+		return responseDelivery;
 	}
 
 	public static class Build {
@@ -184,11 +243,22 @@ public class AppUpdateServiceConfiguration {
 			return this;
 		}
 		
-		public Build addRequestParam(String key, Object value) {
-			if (config.requestParams == null) {
-				config.requestParams = new HashMap<String, Object>();
-			}
-			config.requestParams.put(key, value);
+		public Build addRequestParams(String key, String value) {
+			config.addRequestParam(key, value);
+			return this;
+		}
+		
+		public Build setDefaultRequestParamsIgnore(boolean appInfo, boolean displayInfo, boolean networkInfo, boolean osInfo, boolean simInfo) {
+			config.ignoreRequestAppInfo = appInfo;
+			config.ignoreRequestDisplayInfo = displayInfo;
+			config.ignoreRequestNetworkInfo = networkInfo;
+			config.ignoreRequestOSInfo = osInfo;
+			config.ignoreRequestSimInfo = simInfo;
+			return this;
+		}
+		
+		public Build setResponseDelivery(ResponseDelivery responseDelivery) {
+			config.responseDelivery = responseDelivery;
 			return this;
 		}
 		
@@ -197,7 +267,7 @@ public class AppUpdateServiceConfiguration {
 			return this;
 		}
 		
-		public Build setVersionCompare(VersionCompare versionCompare) {
+		public Build setVersionCompare(VersionComparer versionCompare) {
 			config.versionCompare = versionCompare;
 			return this;
 		}
@@ -213,6 +283,10 @@ public class AppUpdateServiceConfiguration {
 			
 			setDefaultTips(context);
 			
+			if (config.responseDelivery == null) {
+				setResponseDelivery(new SimpleResponseDelivery());
+				log.trace("use default ResponseDelivery : " + config.responseDelivery);
+			}
 			if (config.responseParser == null) {
 				setResponseParser(new SimpleJSONParser());
 				log.trace("use default ResponseParser : " + config.responseParser);
@@ -258,16 +332,67 @@ public class AppUpdateServiceConfiguration {
 				PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 				version = info.versionName;
 			} catch (NameNotFoundException e) {
-				
+				log.error("get version name fail");
 			}
 			setUserAgent(String.format("AppUpdateService(%s,%s)", context.getPackageName(), version));
 		}
 		
 		private void setDefaultRequestParams(Context context) {
-			if (config.requestParams == null) {
-				config.requestParams = new HashMap<String, Object>();
+			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+			
+			//设置分辨率参数
+			if (!config.ignoreRequestDisplayInfo) {
+				DisplayMetrics dm = context.getResources().getDisplayMetrics();
+				config.addRequestParam(PARAM_WIDTH, dm.widthPixels);
+				config.addRequestParam(PARAM_HEIGHT, dm.heightPixels);
+				config.addRequestParam(PARAM_DENSITY, dm.density);
+				config.addRequestParam(PARAM_DENSITYDPI, dm.densityDpi);
 			}
-			//加入参数
+			
+			//设置手机的信息
+			if (!config.ignoreRequestAppInfo) {
+				config.addRequestParam(PARAM_DEVICEID, tm.getDeviceId());
+				config.addRequestParam(PARAM_PRODUCT, android.os.Build.PRODUCT);
+				config.addRequestParam(PARAM_MODEL, android.os.Build.MODEL);
+				config.addRequestParam(PARAM_BRAND, android.os.Build.BRAND);
+				config.addRequestParam(PARAM_MANUFACTURER, android.os.Build.MANUFACTURER);
+			}
+			
+			//设置操作系统信息
+			if (!config.ignoreRequestOSInfo) {
+				config.addRequestParam(PARAM_OSNAME, android.os.Build.VERSION.CODENAME);
+				config.addRequestParam(PARAM_SDKRELEASE, android.os.Build.VERSION.RELEASE);
+				config.addRequestParam(PARAM_SDKVERSION, android.os.Build.VERSION.SDK_INT);
+			}
+			
+			//设置网络信息
+			if (!config.ignoreRequestNetworkInfo) {
+				config.addRequestParam(PARAM_NETWORK, tm.getNetworkType());
+			}
+			
+			//设置手机号码信息
+			if (!config.ignoreRequestSimInfo) {
+				config.addRequestParam(PARAM_PHONE, tm.getLine1Number());
+				config.addRequestParam(PARAM_PHONETYPE, tm.getPhoneType());
+				config.addRequestParam(PARAM_SIMCOUNTRY, tm.getSimCountryIso());
+				config.addRequestParam(PARAM_SIM, tm.getSimSerialNumber());
+				config.addRequestParam(PARAM_SIMNAME, tm.getSimOperatorName());
+				config.addRequestParam(PARAM_SIMCODE, tm.getSimOperator());
+			}
+			
+			//设置App的信息
+			if (!config.ignoreRequestAppInfo) {
+				config.addRequestParam(PARAM_APPTYPE, "APK");
+				config.addRequestParam(PARAM_APP, context.getPackageName());
+				try {
+					PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+					config.addRequestParam(PARAM_VERSIONCODE, info.versionCode);
+					config.addRequestParam(PARAM_VERSIONNAME, info.versionName);
+					config.addRequestParam(PARAM_DEBUG, BuildConfig.DEBUG);
+				} catch (NameNotFoundException e) {
+					log.error("get version name fail");
+				}
+			}
 		}
 		
 		private void setDefaultTips(Context context) {

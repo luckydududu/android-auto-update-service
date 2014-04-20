@@ -19,9 +19,14 @@ import com.yepstudio.android.service.autoupdate.internal.AutoUpgradeDelegate;
  */
 public class AppUpdateService {
 	
+	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(AppUpdateService.class);
 	private static Map<String, AppUpdateServiceConfiguration> configurationMap;
 	private static Class<? extends AppUpdate> clazz;
 	private static Map<String, SoftReference<AppUpdate>> appUpdateMap;
+	
+	public static void setAutoUpgradeDelegate(Class<? extends AppUpdate> delegate) {
+		clazz = delegate;
+	}
 	
 	public static void init(Context context, AppUpdateServiceConfiguration config) {
 		String module = null;
@@ -43,6 +48,7 @@ public class AppUpdateService {
 		if(context == null || TextUtils.isEmpty(module) || config == null){
 			throw new IllegalArgumentException("AppUpdateService init fail. Context，module，config can not be initialized with null Or Empty.");
 		}
+		log.info("init module : " + module);
 		if (configurationMap == null) {
 			configurationMap = new ConcurrentHashMap<String, AppUpdateServiceConfiguration>(3);
 		}
@@ -54,6 +60,7 @@ public class AppUpdateService {
 	}
 	
 	public static void checkUpdate(Context context, String module, boolean isAutoUpdate) {
+		log.info("checkUpdate module : " + module + ", isAutoUpdate : " + isAutoUpdate);
 		if(appUpdateMap == null) {
 			appUpdateMap = new HashMap<String, SoftReference<AppUpdate>>();
 		}
@@ -77,6 +84,7 @@ public class AppUpdateService {
 			if (config == null) {
 				throw new RuntimeException("AppUpdateService.init be call for this module.");
 			}
+			config.addRequestParam(AppUpdateServiceConfiguration.PARAM_AUTOUPDATE, isAutoUpdate);
 			appUpdateMap.put(module, new SoftReference<AppUpdate>(appUpdate));
 		}
 		appUpdate.checkUpdate(module, context, isAutoUpdate);

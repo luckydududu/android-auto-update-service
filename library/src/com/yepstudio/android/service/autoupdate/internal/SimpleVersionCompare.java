@@ -7,7 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import com.yepstudio.android.service.autoupdate.AutoUpdateLog;
 import com.yepstudio.android.service.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.service.autoupdate.Version;
-import com.yepstudio.android.service.autoupdate.VersionCompare;
+import com.yepstudio.android.service.autoupdate.VersionComparer;
 
 /**
  * 
@@ -16,7 +16,7 @@ import com.yepstudio.android.service.autoupdate.VersionCompare;
  * @version 1.0, 2014年4月18日
  *
  */
-public class SimpleVersionCompare implements VersionCompare {
+public class SimpleVersionCompare implements VersionComparer {
 	
 	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(SimpleVersionCompare.class);
 

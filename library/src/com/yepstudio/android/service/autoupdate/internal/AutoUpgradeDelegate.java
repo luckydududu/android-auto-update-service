@@ -1,12 +1,5 @@
 package com.yepstudio.android.service.autoupdate.internal;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
@@ -34,19 +27,13 @@ public class AutoUpgradeDelegate implements AppUpdate {
 	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(AutoUpgradeDelegate.class);
 	
 	private Toast toast;
-	private AtomicBoolean isChecking = new AtomicBoolean(false); 
-	private boolean responseError = false;
-	private boolean parserError = false;
+	protected AtomicBoolean isChecking = new AtomicBoolean(false); 
+	protected boolean responseError = false;
+	protected boolean parserError = false;
 
 	public void checkUpdate(String module, final Context context, final boolean isAutoUpdate) {
 		final AppUpdateServiceConfiguration config = AppUpdateService.getConfiguration(module);
-		String tip;
-		//如果没有网络
-		if (!NetworkUtil.hasNetwork(context)) {
-			if (!isAutoUpdate) {
-				tip = config.getTip(AppUpdateServiceConfiguration.TIP_KEY_NETWORKNOTACTIVATED);
-				showToast(context, tip, Toast.LENGTH_LONG);
-			}
+		if (!canStartUpdateCheck(config, context, isAutoUpdate)) {
 			log.info("update stop, hasNetwork : false, isAutoUpdate:" + isAutoUpdate);
 			return;
 		}
@@ -61,31 +48,55 @@ public class AutoUpgradeDelegate implements AppUpdate {
 
 			@Override
 			protected void onPostExecute(Version version) {
+				processUpdatePolicyOfServer(config, version, isAutoUpdate);
 				processResponseListener(config, context, isAutoUpdate, version);
-				isChecking.set(false);
-				responseError = false;
-				parserError = false;
+				finishUpdateCheck();
 			}
 			
 		};
 		
+		startUpdateCheck(config, context, isAutoUpdate);
 		if (!isChecking.getAndSet(true)) {//如果没有检查更新则去检查更新
 			log.info("execute check update... isAutoUpdate:" + isAutoUpdate);
 			task.execute();
 		} else {
 			log.info("has check update is running, so skip it. isAutoUpdate:" + isAutoUpdate);
 		}
-		
+	}
+
+	protected boolean canStartUpdateCheck(AppUpdateServiceConfiguration config, Context context, boolean isAutoUpdate) {
+		log.trace("canStartUpdateCheck...");
+		if (!NetworkUtil.hasNetwork(context)) {
+			log.trace("has not Network stop UpdateCheck.");
+			if (!isAutoUpdate) {
+				String tip = config.getTip(AppUpdateServiceConfiguration.TIP_KEY_NETWORKNOTACTIVATED);
+				showToast(context, tip, Toast.LENGTH_LONG);
+			}
+			return false;
+		}
+		return true;
+	}
+	
+	protected void startUpdateCheck(AppUpdateServiceConfiguration config, Context context, boolean isAutoUpdate) {
+		log.trace("startUpdateCheck...");
 		if (!isAutoUpdate) {
-			tip = config.getTip(AppUpdateServiceConfiguration.TIP_KEY_CHECK_NEW_VERSION);
+			String tip = config.getTip(AppUpdateServiceConfiguration.TIP_KEY_CHECK_NEW_VERSION);
 			showToast(context, tip, Toast.LENGTH_LONG);
 		}
 	}
 	
-	private Version checkUpdateInTask(AppUpdateServiceConfiguration config) {
+	protected void finishUpdateCheck() {
+		log.trace("finishUpdateCheck.");
+		isChecking.set(false);
+		responseError = false;
+		parserError = false;
+	}
+	
+	protected Version checkUpdateInTask(AppUpdateServiceConfiguration config) {
+		log.trace("checkUpdateInTask...");
 		String response = null;
 		try {
-			response = requestUpdateCheck(config.getUpdateUrl(), config.getUserAgent(), config.getRequestParams());
+			response = config.getResponseDelivery().submitRequest(config.getUpdateUrl(), "GET", config.getUserAgent(), config.getRequestParams());
 		} catch (Throwable exp) {
 			log.error("requestUpdateCheck error", exp);
 			responseError = true;
@@ -93,7 +104,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		Version version = null;
 		if (!TextUtils.isEmpty(response)) {
 			try {
-				version = config.getResponseParser().parser(config.getModule(), response);
+				version = config.getResponseParser().parser(response);
 				log.trace("ResponseParser version success.");
 			} catch (Throwable exp) {
 				log.error("ResponseParser error", exp);
@@ -102,7 +113,13 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		} else {
 			log.info("response isEmpty, no Version to Update");
 		}
-		//判断是否忽略服务器返回的更新策略
+		
+		return version;
+	}
+	
+	protected Version processUpdatePolicyOfServer(AppUpdateServiceConfiguration config, Version version, boolean isAutoUpdate) {
+		log.trace("processUpdatePolicyOfServer");
+		// 判断是否忽略服务器返回的更新策略
 		if (version != null && config.ignoreServerPolicy()) {
 			log.info("ignoreServerPolicy");
 			version.setUpdatePolicy(config.getUpdatePolicy());
@@ -110,7 +127,8 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		return version;
 	}
 	
-	private void processResponseListener(AppUpdateServiceConfiguration config, Context context, boolean isAutoUpdate, Version version) {
+	protected void processResponseListener(AppUpdateServiceConfiguration config, Context context, boolean isAutoUpdate, Version version) {
+		log.trace("processResponseListener");
 		ResponseListener resListener = config.getResponseListener();
 		String tip;
 		if (responseError) {
@@ -140,50 +158,6 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		}
 	}
 	
-	/**
-	 * 请求
-	 * @param checkUrl
-	 * @param userAgent
-	 * @return
-	 * @throws IOException
-	 */
-	private String requestUpdateCheck(String updateUrl, String userAgent, Map<String, Object> requestParams) throws IOException {
-		log.trace("requestUpdateCheck");
-		log.trace("updateUrl:" + updateUrl);
-		log.trace("userAgent:" + userAgent);
-		log.trace("requestParams:" + requestParams);
-		
-		URL targetUrl = new URL(updateUrl);
-		//设置UserAgent
-		HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
-		InputStream is = connection.getInputStream();
-		String response = toStringBuffer(is).toString();
-		log.trace("response:" + response);
-		is.close();
-		connection.disconnect();
-		return response;
-	}
-	
-	/**
-	 * 读取输出流
-	 * @param is InputStream
-	 * @return
-	 * @throws IOException
-	 */
-	private StringBuffer toStringBuffer(InputStream is) throws IOException {
-		if (null == is) {
-			return null;
-		}
-		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-		StringBuffer buffer = new StringBuffer();
-		String line = null;
-		while ((line = in.readLine()) != null) {
-			buffer.append(line).append("\n");
-		}
-		is.close();
-		return buffer;
-	}
-
 	private void showToast(Context context, String text, int duration) {
 		if (!TextUtils.isEmpty(text)) {
 			if (toast != null) {

@@ -20,7 +20,7 @@ public class SimpleJSONParser implements ResponseParser {
 	public static final String ROOT_NODE = "response";
 
 	@Override
-	public Version parser(String module, String response) {
+	public Version parser(String response) {
 		Version version = null;
 		try {
 			response = response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1);
