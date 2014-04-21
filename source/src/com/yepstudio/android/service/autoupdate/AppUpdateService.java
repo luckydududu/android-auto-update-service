@@ -130,10 +130,10 @@ public class AppUpdateService {
 						toast.cancel();
 					}
 					toast = Toast.makeText(context, tip, Toast.LENGTH_LONG);
-					toast.show();
 					Version version = config.getVersionPersistent().load(key, context);
 					if (config.getVersionCompare().compare(key, context, version)) {
 						config.getUserOptionsListener().doUpdate(key, context, version, false);
+						toast.show();
 						config.getVersionPersistent().notifyFinish(config.getModule(), context, version);
 					}
 				}
