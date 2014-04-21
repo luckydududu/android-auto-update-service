@@ -82,6 +82,8 @@ public class AppUpdateServiceConfiguration {
 	public static final String TIP_KEY_HAS_NEW_VERSION_LABEL = "aus__has_new_version_label";
 	/***有新版本的提示**/
 	public static final String TIP_KEY_NEW_VERSION_DOWNLOADING = "tip_key_new_version_downloading";
+	/***在有网络的时候突然进行更新的提示**/
+	public static final String TIP_KEY_LATER_UPDATE_TIP = "tip_key_later_update_tip";
 	
 	
 	public static final String PARAM_WIDTH = "width";
@@ -450,6 +452,7 @@ public class AppUpdateServiceConfiguration {
 			setTipIfEmpty(TIP_KEY_IS_LATEST_VERSION_LABEL, context, R.string.aus__is_latest_version_label);
 			setTipIfEmpty(TIP_KEY_HAS_NEW_VERSION_LABEL, context, R.string.aus__has_new_version_label);
 			setTipIfEmpty(TIP_KEY_NEW_VERSION_DOWNLOADING, context, R.string.aus__update_downloading);
+			setTipIfEmpty(TIP_KEY_LATER_UPDATE_TIP, context, R.string.aus__later_update_tip);
 		}
 		
 		@TargetApi(android.os.Build.VERSION_CODES.GINGERBREAD)

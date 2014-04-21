@@ -34,7 +34,7 @@ public class SimpleJSONParser implements ResponseParser {
 			version.setApp(json.getString("app"));
 			version.setCode(json.getInt("version"));
 			version.setName(json.getString("name"));
-			version.setTitle(json.getString("title"));
+			version.setTitle(json.getString("aus__title"));
 			version.setDescription(json.getString("description"));
 			version.setReleaseTime(new Date(json.getLong("release")));
 			version.setTargetUrl(json.getString("url"));

@@ -121,7 +121,7 @@ public class SharedPreferencesVersionPersistent implements VersionPersistent {
 		}
 		return 0L;
 	}
-
+	
 	@Override
 	public void notifyFinish(String module, Context context, Version version) {
 		log.trace("notifyFinish, module : " + module);

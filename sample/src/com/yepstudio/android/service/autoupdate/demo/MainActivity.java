@@ -43,8 +43,7 @@ public class MainActivity extends Activity {
 		check.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// 检查最新版本，并弹出窗口
-				AppUpdateService.checkUpdate(MainActivity.this, true);
+				AppUpdateService.checkUpdate(MainActivity.this, false);
 			}
 		});
 		
@@ -52,8 +51,7 @@ public class MainActivity extends Activity {
 		download.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// 无须提示，直接升级
-				AppUpdateService.checkUpdate(MainActivity.this, false);
+				AppUpdateService.checkUpdate(MainActivity.this, true);
 			}
 		});
 	}

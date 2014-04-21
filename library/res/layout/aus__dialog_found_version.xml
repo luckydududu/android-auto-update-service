@@ -7,7 +7,7 @@
     android:padding="15dp" >
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/aus__title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -16,7 +16,7 @@
         android:textColor="@android:color/black" />
 
     <TextView
-        android:id="@+id/feature"
+        android:id="@+id/aus__feature"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -25,7 +25,7 @@
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/time"
+        android:id="@+id/aus__time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -39,14 +39,14 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/ignore"
+            android:id="@+id/aus__ignore"
             style="@style/button"
             android:layout_weight="1"
             android:background="@drawable/aus__button_orange_light"
             android:text="@string/aus__ignore" />
 
         <Button
-            android:id="@+id/update"
+            android:id="@+id/aus__update"
             style="@style/button"
             android:layout_weight="1"
             android:background="@drawable/aus__button_orange"
@@ -54,7 +54,7 @@
     </LinearLayout>
 
     <CheckBox
-        android:id="@+id/only_wifi"
+        android:id="@+id/aus__only_wifi"
         style="@style/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

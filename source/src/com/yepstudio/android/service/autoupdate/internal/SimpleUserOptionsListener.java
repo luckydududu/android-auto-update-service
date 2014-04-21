@@ -90,6 +90,7 @@ public class SimpleUserOptionsListener implements UserOptionsListener {
 				if (result != null && result == true) {
 					log.info("download success, CheckFile success, start install...");
 					installAPK(config, context, apk);
+					//config.getVersionPersistent().notifyFinish(config.getModule(), context, version);
 				} else {
 					if (apk != null) {
 						if (!apk.delete()) {

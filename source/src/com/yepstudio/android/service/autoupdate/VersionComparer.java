@@ -19,5 +19,5 @@ public interface VersionComparer {
 	 * @param isAutoUpdate
 	 * @return true是新版本，false不是
 	 */
-	public boolean compare(String module, Context context, Version version, boolean isAutoUpdate);
+	public boolean compare(String module, Context context, Version version);
 }

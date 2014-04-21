@@ -5,10 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.yepstudio.android.service.autoupdate.internal.AutoUpgradeDelegate;
+import com.yepstudio.android.service.autoupdate.internal.NetworkUtil;
 
 /**
  * 
@@ -23,6 +29,7 @@ public class AppUpdateService {
 	private static Map<String, AppUpdateServiceConfiguration> configurationMap;
 	private static Class<? extends AppUpdate> clazz;
 	private static Map<String, SoftReference<AppUpdate>> appUpdateMap;
+	private static BroadcastReceiver networkStateReceiver;
 	
 	public static void setAutoUpgradeDelegate(Class<? extends AppUpdate> delegate) {
 		clazz = delegate;
@@ -45,7 +52,7 @@ public class AppUpdateService {
 	}
 	
 	public static void init(Context context, String module, AppUpdateServiceConfiguration config) {
-		if(context == null || TextUtils.isEmpty(module) || config == null){
+		if(context == null || TextUtils.isEmpty(module) || config == null) {
 			throw new IllegalArgumentException("AppUpdateService init fail. Context，module，config can not be initialized with null Or Empty.");
 		}
 		log.info("init module : " + module);
@@ -57,6 +64,11 @@ public class AppUpdateService {
 		}
 		config.setModule(module);
 		configurationMap.put(module, config);
+		if (networkStateReceiver == null) {
+			networkStateReceiver = new NetworkStateReceiver();
+			IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+			context.getApplicationContext().registerReceiver(networkStateReceiver, filter);
+		}
 	}
 	
 	public static void checkUpdate(Context context, String module, boolean isAutoUpdate) {
@@ -98,6 +110,35 @@ public class AppUpdateService {
 			return configurationMap.get(module);
 		}
 		return null;
+	}
+	
+	private static class NetworkStateReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			log.info("NetworkStateReceiver onReceive");
+			if (intent == null) {
+				return;
+			}
+			if (NetworkUtil.getNetworkType(context) == NetworkUtil.WIFI) {// 只有在WIFI的情况下才会去执行
+				log.debug("has WIFI, start download...");
+				Toast toast = null;
+				String tip;
+				for (String key : configurationMap.keySet()) {
+					AppUpdateServiceConfiguration config = getConfiguration(key);
+					tip = config.getTip(AppUpdateServiceConfiguration.TIP_KEY_LATER_UPDATE_TIP);
+					if (toast != null) {
+						toast.cancel();
+					}
+					toast = Toast.makeText(context, tip, Toast.LENGTH_LONG);
+					toast.show();
+					Version version = config.getVersionPersistent().load(key, context);
+					if (config.getVersionCompare().compare(key, context, version)) {
+						config.getUserOptionsListener().doUpdate(key, context, version, false);
+						config.getVersionPersistent().notifyFinish(config.getModule(), context, version);
+					}
+				}
+			}
+		}
 	}
 	
 }

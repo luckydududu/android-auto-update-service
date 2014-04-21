@@ -40,9 +40,9 @@ public class SimpleDisplayDelegate implements DisplayDelegate {
         dialog.setContentView(R.layout.aus__dialog_found_version);
         dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         
-        TextView title = (TextView) dialog.findViewById(R.id.title);
-        TextView feature = (TextView) dialog.findViewById(R.id.feature);
-        TextView time = (TextView) dialog.findViewById(R.id.time);
+        TextView title = (TextView) dialog.findViewById(R.id.aus__title);
+        TextView feature = (TextView) dialog.findViewById(R.id.aus__feature);
+        TextView time = (TextView) dialog.findViewById(R.id.aus__time);
 		if (TextUtils.isEmpty(version.getTitle())) {
 			title.setText(String.format(context.getResources().getString(R.string.aus__latest_version_title), version.getName()));
 		} else {
@@ -58,15 +58,15 @@ public class SimpleDisplayDelegate implements DisplayDelegate {
 		}
         feature.setText(version.getDescription());
         
-        View ignore = dialog.findViewById(R.id.ignore);
-        View update = dialog.findViewById(R.id.update);
+        View ignore = dialog.findViewById(R.id.aus__ignore);
+        View update = dialog.findViewById(R.id.aus__update);
 
         UpdatePolicy updatePolicy = version.getUpdatePolicy();
 		if (updatePolicy == null) {
-			AppUpdateService.getConfiguration(module).getUpdatePolicy();
+			updatePolicy = AppUpdateService.getConfiguration(module).getUpdatePolicy();
 		}
         
-        final CheckBox laterOnWifi = (CheckBox) dialog.findViewById(R.id.only_wifi);
+        final CheckBox laterOnWifi = (CheckBox) dialog.findViewById(R.id.aus__only_wifi);
         //非Wifi情况下
 		if (NetworkUtil.getNetworkType(context) != NetworkUtil.WIFI) {
 			//判断更新策略

@@ -151,7 +151,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		}
 		if (!parserError && !parserError) {
 			// 返回解析并且解析成功
-			if (config.getVersionCompare().compare(config.getModule(), context, version, isAutoUpdate)) {
+			if (config.getVersionCompare().compare(config.getModule(), context, version)) {
 				if (!resListener.onFoundLatestVersion(config.getModule(), context, version, isAutoUpdate)) {
 					config.getDisplayDelegate().showFoundLatestVersion(config.getModule(), context, version, isAutoUpdate);
 				}

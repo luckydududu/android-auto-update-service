@@ -21,7 +21,7 @@ public class SimpleVersionCompare implements VersionComparer {
 	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(SimpleVersionCompare.class);
 
 	@Override
-	public boolean compare(String module, Context context, Version version, boolean isAutoUpdate) {
+	public boolean compare(String module, Context context, Version version) {
 		if (version == null) {
 			log.trace("version is null, not new update version");
 			return false;
