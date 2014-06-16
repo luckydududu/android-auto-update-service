@@ -116,8 +116,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		try {
 			wrapper.append("start-request");
 			response = responseDelivery.submitRequest(info);
-			log.trace("submitRequest:" + response.toString());
-		} catch (IOException exp) {
+		} catch (Throwable exp) {
 			log.error("requestUpdateCheck error", exp);
 			wrapper.setRequestError(true);
 			wrapper.append("request-error");

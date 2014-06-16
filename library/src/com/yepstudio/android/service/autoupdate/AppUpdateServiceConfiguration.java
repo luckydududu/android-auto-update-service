@@ -229,6 +229,14 @@ public class AppUpdateServiceConfiguration {
 			return this;
 		}
 		
+		public Build addRequestParams(String key, Object value) {
+			if (requestParams == null) {
+				requestParams = new HashMap<String, Object>();
+			}
+			requestParams.put(key, value);
+			return this;
+		}
+		
 		public Build setResponseCallback(ResponseListener responseListener) {
 			this.responseListener = responseListener;
 			return this;
@@ -252,10 +260,6 @@ public class AppUpdateServiceConfiguration {
 		
 		public Build setCheckFileDelegate(CheckFileDelegate checkFileDelegate) {
 			this.checkFileDelegate = checkFileDelegate;
-			return this;
-		}
-		
-		public Build addRequestParams(String key, String value) {
 			return this;
 		}
 		

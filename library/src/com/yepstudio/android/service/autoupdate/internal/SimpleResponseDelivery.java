@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import com.yepstudio.android.service.autoupdate.Version;
 public class SimpleResponseDelivery implements ResponseDelivery<String> {
 	
 	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(SimpleResponseDelivery.class);
+	private static String CHARSET_NAME = "UTF-8";
 	
 	@Override
 	public String submitRequest(RequestInfo requestInfo) throws IOException {
@@ -40,7 +42,9 @@ public class SimpleResponseDelivery implements ResponseDelivery<String> {
 		if (requestParams != null && requestParams.size() > 0) {
 			builder.append(updateUrl.contains("?") ? "&" : "?");
 			for (String key : requestParams.keySet()) {
-				builder.append(key).append("=").append(String.valueOf(requestParams.get(key)));
+				builder.append(URLEncoder.encode(key, CHARSET_NAME));
+				builder.append("=");
+				builder.append(URLEncoder.encode(String.valueOf(requestParams.get(key)), CHARSET_NAME));
 				builder.append("&");
 			}
 			builder.deleteCharAt(builder.length() - 1);
@@ -102,7 +106,7 @@ public class SimpleResponseDelivery implements ResponseDelivery<String> {
 		Version version = null;
 		try {
 			response = response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1);
-			log.trace("json:" + response);
+			//log.trace("json:" + response);
 			JSONObject json = new JSONObject(response);
 
 			if (json.has(ROOT_NODE) && !json.isNull(ROOT_NODE)) {
