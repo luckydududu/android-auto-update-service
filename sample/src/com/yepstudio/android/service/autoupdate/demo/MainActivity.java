@@ -8,9 +8,9 @@ import android.view.View;
 
 import com.yepstudio.android.service.autoupdate.AppUpdateService;
 import com.yepstudio.android.service.autoupdate.AppUpdateServiceConfiguration;
-import com.yepstudio.android.service.autoupdate.ResponseParser;
 import com.yepstudio.android.service.autoupdate.Version;
 import com.yepstudio.android.service.autoupdate.demo.R;
+import com.yepstudio.android.service.autoupdate.internal.SimpleResponseDelivery;
 
 public class MainActivity extends Activity {
 
@@ -23,10 +23,10 @@ public class MainActivity extends Activity {
 		
 		AppUpdateServiceConfiguration.Build config = new AppUpdateServiceConfiguration.Build();
 		config.setCheckUpdateUrl(UPDATE_URL);
-		config.setResponseParser(new ResponseParser() {
+		config.setResponseDelivery(new SimpleResponseDelivery() {
 			
 			@Override
-			public Version parser(String response) {
+			public Version parserResponse(String response) {
 				Version version = new Version();
 				version.setApp(MainActivity.this.getPackageName());
 				version.setCode(2);
