@@ -1,7 +1,6 @@
 package com.yepstudio.android.service.autoupdate.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
