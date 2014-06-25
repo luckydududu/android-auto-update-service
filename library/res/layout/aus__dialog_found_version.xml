@@ -40,14 +40,14 @@
 
         <Button
             android:id="@+id/aus__ignore"
-            style="@style/button"
+            style="@style/aus__button"
             android:layout_weight="1"
             android:background="@drawable/aus__button_orange_light"
             android:text="@string/aus__ignore" />
 
         <Button
             android:id="@+id/aus__update"
-            style="@style/button"
+            style="@style/aus__button"
             android:layout_weight="1"
             android:background="@drawable/aus__button_orange"
             android:text="@string/aus__update" />
@@ -55,7 +55,7 @@
 
     <CheckBox
         android:id="@+id/aus__only_wifi"
-        style="@style/checkbox"
+        style="@style/aus__checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

@@ -12,7 +12,7 @@
         android:id="@+id/check"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Check and SHOW latest version dialog" />
+        android:text="手动检查更新" />
 
     <Button
         android:id="@+id/download"
@@ -20,6 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/check"
         android:layout_marginTop="10dp"
-        android:text="Check and update directly" />
+        android:text="自动检查更新" />
 
 </RelativeLayout>

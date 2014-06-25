@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yepstudio.android.service.autoupdate.demo"
+    package="com.yepstudio.android.sample.autoupdate"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.2" >
 
     <uses-sdk
         android:minSdkVersion="5"
@@ -22,12 +22,13 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
+        android:name="com.yepstudio.android.sample.autoupdate.AppApplication"
         android:allowBackup="true"
         android:icon="@drawable/aus__ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.yepstudio.android.service.autoupdate.demo.MainActivity"
+            android:name="com.yepstudio.android.sample.autoupdate.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

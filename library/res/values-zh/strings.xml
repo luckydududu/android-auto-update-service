@@ -20,7 +20,7 @@
     <string name="aus__update_downloading">更新文件正在下载，请稍候&#8230;</string>
     <string name="aus__later_update_tip">更新中&#8230; (您在非Wifi环境下提交了此更新任务)</string>
     
-    <string name="download_failure">下载最新版本失败!</string>
-    <string name="apk_file_not_exists">Apk 文件不存在 !</string>
-    <string name="update_latest_version_title">最新版本可用(%1$s), 更新中&#8230;</string>
+    <string name="aus__download_failure">下载最新版本失败!</string>
+    <string name="aus__apk_file_not_exists">Apk 文件不存在 !</string>
+    <string name="aus__update_latest_version_title">最新版本可用(%1$s), 更新中&#8230;</string>
 </resources>
