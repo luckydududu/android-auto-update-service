@@ -14,6 +14,8 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.text.TextUtils;
+
 import com.yepstudio.android.library.autoupdate.AutoUpdateLog;
 import com.yepstudio.android.library.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.library.autoupdate.RequestInfo;
@@ -104,6 +106,9 @@ public class SimpleResponseDelivery implements ResponseDelivery<String> {
 	public Version parserResponse(String response) throws Exception {
 		log.debug("start parserResponse...");
 		Version version = null;
+		if (TextUtils.isEmpty(response) || !response.contains("{") || !response.contains("}")) {
+			return null;
+		}
 		try {
 			response = response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1);
 			//log.trace("json:" + response);
