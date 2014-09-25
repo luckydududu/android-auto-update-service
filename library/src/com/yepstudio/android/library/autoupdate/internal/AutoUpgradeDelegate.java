@@ -126,7 +126,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 			try {
 				wrapper.append("parser-response");
 				version = responseDelivery.parserResponse(response);
-				log.trace("ResponseParser version success : " + version.toString());
+				log.trace("ResponseParser version success : " + version);
 			} catch (Exception exp) {
 				log.error("ResponseParser error", exp);
 				wrapper.setParserResponseError(true);
