@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -28,6 +30,27 @@ public class AppUpdateService {
 	private static AutoUpdateLog log = AutoUpdateLogFactory.getAutoUpdateLog(AppUpdateService.class);
 	private static Map<String, AppUpdateServiceConfiguration> configurationMap;
 	private static BroadcastReceiver networkStateReceiver;
+	private static Toast toast;
+	
+	public static void show(Context context, int msgResId, int duration) {
+		show(context, context.getString(msgResId), duration);
+	}
+	
+	public static void show(final Context context, final String msg, final int duration) {
+		Handler handler = new Handler(Looper.getMainLooper());
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				if (toast == null) {
+					toast = Toast.makeText(context, msg, duration);
+				}
+				toast.setText(msg);
+				toast.setDuration(duration);
+				toast.show();
+			}
+		});
+	}
 	
 	public static void init(Context context, AppUpdateServiceConfiguration config) {
 		String module = null;
@@ -93,8 +116,6 @@ public class AppUpdateService {
 			}
 			if (NetworkUtil.getNetworkType(context) == NetworkUtil.WIFI) {// 只有在WIFI的情况下才会去执行
 				logger.debug("has WIFI, start download...");
-				Toast toast = null;
-				String tip;
 				for (String module : configurationMap.keySet()) {
 					AppUpdateServiceConfiguration config = getConfiguration(module);
 					ContextWrapper wrapper = new ContextWrapper(config, module, context, false);
@@ -102,15 +123,9 @@ public class AppUpdateService {
 					Version version = config.getVersionPersistent().load(module, context);
 					wrapper.setVersion(version);
 					
-					tip = context.getResources().getString(R.string.aus__later_update_tip);
-					if (toast != null) {
-						toast.cancel();
-					}
-					toast = Toast.makeText(context, tip, Toast.LENGTH_LONG);
-					
 					if (config.getVersionCompare().compare(context, version)) {
 						AutoUpgradeDelegate.doUpdate(wrapper);
-						toast.show();
+						show(context, R.string.aus__later_update_tip, Toast.LENGTH_LONG);
 						config.getVersionPersistent().notifyFinish(module, context, version);
 					}
 				}
