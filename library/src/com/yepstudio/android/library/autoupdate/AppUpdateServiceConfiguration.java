@@ -15,7 +15,7 @@ import com.yepstudio.android.library.autoupdate.internal.AndroidDownloadDelegate
 import com.yepstudio.android.library.autoupdate.internal.ApkInstallExecutor;
 import com.yepstudio.android.library.autoupdate.internal.AutoUpgradeDelegate;
 import com.yepstudio.android.library.autoupdate.internal.BrowserDownloadDelegate;
-import com.yepstudio.android.library.autoupdate.internal.FileCheckFileDelegate;
+import com.yepstudio.android.library.autoupdate.internal.NoneCheckFileDelegate;
 import com.yepstudio.android.library.autoupdate.internal.SharedPreferencesVersionPersistent;
 import com.yepstudio.android.library.autoupdate.internal.SimpleDisplayDelegate;
 import com.yepstudio.android.library.autoupdate.internal.SimpleResponseDelivery;
@@ -191,7 +191,7 @@ public class AppUpdateServiceConfiguration {
 				downloadDelegate = getDefaultDownloadDelegate(context);
 			}
 			if (checkFileDelegate == null) {
-				checkFileDelegate = new FileCheckFileDelegate();
+				checkFileDelegate = new NoneCheckFileDelegate();
 			}
 			if (updatePolicy == null) {
 				updatePolicy = new UpdatePolicy();
