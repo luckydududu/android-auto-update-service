@@ -3,6 +3,7 @@ package com.yepstudio.android.library.autoupdate.internal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -37,7 +38,6 @@ public class SimpleDisplayDelegate implements DisplayDelegate {
 	public void showFoundLatestVersion(final Context context, final Version version, final boolean isAutoUpdate, final UserOptionsListener listener) {
 		final Dialog dialog = new Dialog(context, R.style.aus__dialog);
         dialog.setContentView(R.layout.aus__dialog_found_version);
-        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         
         TextView title = (TextView) dialog.findViewById(R.id.aus__title);
         TextView feature = (TextView) dialog.findViewById(R.id.aus__feature);
@@ -109,8 +109,16 @@ public class SimpleDisplayDelegate implements DisplayDelegate {
 			ignore.setVisibility(View.GONE);
 		}
         dialog.setCanceledOnTouchOutside(false);
+        
+        if (context instanceof Activity) {
+        	
+        } else {
+        	dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        }
+        
         dialog.show();
         
+        //调整窗口的大小
         WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();                
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);  
         Display display = windowManager.getDefaultDisplay();
@@ -118,13 +126,13 @@ public class SimpleDisplayDelegate implements DisplayDelegate {
         display.getMetrics(metrics);
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
-	    if (height > width) {  
-	        lp.width = (int) (width * 0.9);          
-	    } else {  
-	        lp.width = (int) (width * 0.5);                  
-	    }  
-	    dialog.getWindow().setAttributes(lp);
-		dialog.show();
+        if (height > width) {
+        	lp.width = (int) (width * 0.9);
+        } else {  
+        	lp.width = (int) (width * 0.5); 
+        }  
+        dialog.getWindow().setAttributes(lp);
+        dialog.show();
 	}
 	
 	private void openWifi(Context context) {
