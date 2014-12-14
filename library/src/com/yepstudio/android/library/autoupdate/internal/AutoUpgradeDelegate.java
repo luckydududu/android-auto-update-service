@@ -288,7 +288,11 @@ public class AutoUpgradeDelegate implements AppUpdate {
 			
 			@Override
 			public void run() {
-				delegate.showFoundLatestVersion(wrapper.getContext(), wrapper.getVersion(), wrapper.isAutoUpdate(), listener);
+				try {
+					delegate.showFoundLatestVersion(wrapper.getContext(), wrapper.getVersion(), wrapper.isAutoUpdate(), listener);
+				} catch (Throwable th) {
+					
+				}
 			}
 		});
 	}
