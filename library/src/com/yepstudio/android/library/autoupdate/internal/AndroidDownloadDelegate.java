@@ -19,6 +19,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.yepstudio.android.library.autoupdate.AppUpdateService;
 import com.yepstudio.android.library.autoupdate.AutoUpdateLog;
 import com.yepstudio.android.library.autoupdate.AutoUpdateLogFactory;
 import com.yepstudio.android.library.autoupdate.DownloadDelegate;
@@ -45,12 +46,12 @@ public class AndroidDownloadDelegate extends BroadcastReceiver implements Downlo
 		if (!canUseSDCard()) {
 			log.warning("can not Use SDCard, so stop download and toast.");
 			if (isUserOpt) {
-				Toast.makeText(context, R.string.aus__sdcard_not_mounted, Toast.LENGTH_SHORT).show();
+				AppUpdateService.show(context, R.string.aus__sdcard_not_mounted, Toast.LENGTH_SHORT);
 			}
 			return false;
 		}
 		if (isUserOpt) {
-			Toast.makeText(context, R.string.aus__start_download, Toast.LENGTH_LONG).show();
+			AppUpdateService.show(context, R.string.aus__start_download, Toast.LENGTH_LONG);
 		}
 		
 		DownloadManager downloader = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);

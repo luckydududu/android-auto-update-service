@@ -5,10 +5,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.yepstudio.android.library.autoupdate.AppUpdate;
+import com.yepstudio.android.library.autoupdate.AppUpdateService;
 import com.yepstudio.android.library.autoupdate.AppUpdateServiceConfiguration;
 import com.yepstudio.android.library.autoupdate.AutoUpdateLog;
 import com.yepstudio.android.library.autoupdate.AutoUpdateLogFactory;
@@ -90,7 +93,7 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		if (!NetworkUtil.hasNetwork(wrapper.getContext())) {//没有网络，则直接提示不能升级
 			log.trace("has not Network stop UpdateCheck.");
 			if (!wrapper.isAutoUpdate()) {
-				Toast.makeText(wrapper.getContext(), R.string.aus__network_not_activated, Toast.LENGTH_SHORT).show();
+				AppUpdateService.show(wrapper.getContext(), R.string.aus__network_not_activated, Toast.LENGTH_SHORT);
 			}
 			wrapper.append("not-network");
 			return false;
@@ -186,9 +189,29 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		if (isSkipThisVersion(wrapper)) {
 			resListener.onSkipLatestVersion(context, version, isAutoUpdate);
 		} else {
-			resListener.onFoundLatestVersion(context, version, isAutoUpdate);
-			doShowFoundLatestVersion(wrapper);
+			if (!isDownloading(wrapper)) {
+				resListener.onFoundLatestVersion(context, version, isAutoUpdate);
+				doShowFoundLatestVersion(wrapper);
+			} else {
+				if (!isAutoUpdate) {
+					AppUpdateService.show(context, R.string.aus__update_downloading, Toast.LENGTH_LONG);
+				}
+			}
 		}
+	}
+	
+	protected boolean isDownloading(ContextWrapper wrapper){
+		Version version = wrapper.getVersion();
+		AppUpdateServiceConfiguration config = wrapper.getConfiguration();
+		Context context = wrapper.getContext();
+		//判断是否有版本正在下载
+		if (config.getDownloadDelegate().isDownloading(wrapper.getModule(), context, version)) {
+			log.info("onFoundLatestVersion be ignore. this version isDownloading...");
+			log.trace("this version be ignore by isDownloading");
+			wrapper.append("skip-version-by-this-version-downloading");
+			return true;
+		}
+		return false;
 	}
 	
 	protected boolean isSkipThisVersion(ContextWrapper wrapper) {
@@ -215,21 +238,10 @@ public class AutoUpgradeDelegate implements AppUpdate {
 		//检查用户是否点击过忽略该版本，如果忽略过，就要检查忽略策略，判断是否要忽略
 		if (updatePolicy.getIgnorePolicy().isIgnore(context, version, isAutoUpdate)) {
 			if (!isAutoUpdate) {
-				Toast.makeText(context, R.string.aus__has_new_version_label, Toast.LENGTH_LONG).show();
+				AppUpdateService.show(context, R.string.aus__has_new_version_label, Toast.LENGTH_LONG);
 			}
 			log.trace("this version be ignore by IgnorePolicy of UpdatePolicy");
 			wrapper.append("skip-version-by-ignore-policy");
-			return true;
-		}
-		
-		//判断是否有版本正在下载
-		if (config.getDownloadDelegate().isDownloading(wrapper.getModule(), context, version)) {
-			log.info("onFoundLatestVersion be ignore. this version isDownloading...");
-			if (!isAutoUpdate) {
-				Toast.makeText(context, R.string.aus__update_downloading, Toast.LENGTH_LONG).show();
-			}
-			log.trace("this version be ignore by isDownloading");
-			wrapper.append("skip-version-by-this-version-downloading");
 			return true;
 		}
 		
@@ -251,9 +263,9 @@ public class AutoUpgradeDelegate implements AppUpdate {
 	
 	protected void doShowFoundLatestVersion(final ContextWrapper wrapper) {
 		log.debug("start doShowFoundLatestVersion...");
-		DisplayDelegate delegate = wrapper.getConfiguration().getDisplayDelegate();
+		final DisplayDelegate delegate = wrapper.getConfiguration().getDisplayDelegate();
 		final UserOptionsListener userListener = wrapper.getConfiguration().getUserOptionsListener();
-		UserOptionsListener listener = new UserOptionsListener() {
+		final UserOptionsListener listener = new UserOptionsListener() {
 
 			@Override
 			public void doUpdate(boolean laterOnWifi) {
@@ -271,13 +283,24 @@ public class AutoUpgradeDelegate implements AppUpdate {
 				AutoUpgradeDelegate.this.doIgnore(wrapper);
 			}
 		};
-		delegate.showFoundLatestVersion(wrapper.getContext(), wrapper.getVersion(), wrapper.isAutoUpdate(), listener);
+		Handler handler = new Handler(Looper.getMainLooper());
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					delegate.showFoundLatestVersion(wrapper.getContext(), wrapper.getVersion(), wrapper.isAutoUpdate(), listener);
+				} catch (Throwable th) {
+					
+				}
+			}
+		});
 	}
 	
 	protected void doUpdateLaterOnWifi(ContextWrapper wrapper) {
 		VersionPersistent persistent = wrapper.getConfiguration().getVersionPersistent();
 		persistent.save(wrapper.getModule(), wrapper.getContext(), wrapper.getVersion());
-		Toast.makeText(wrapper.getContext(), R.string.aus__update_version_just_in_wifi, Toast.LENGTH_LONG).show();
+		AppUpdateService.show(wrapper.getContext(), R.string.aus__update_version_just_in_wifi, Toast.LENGTH_LONG);
 	}
 
 	protected void doIgnore(ContextWrapper wrapper) {
@@ -352,19 +375,19 @@ public class AutoUpgradeDelegate implements AppUpdate {
 						}
 					}
 					log.info("download success, CheckFile not pass, cancel this install, and delete this file.");
-					Toast.makeText(context, R.string.aus__apk_file_invalid, Toast.LENGTH_LONG).show();
+					AppUpdateService.show(context, R.string.aus__apk_file_invalid, Toast.LENGTH_LONG);
 				}
 				super.onPostExecute(result);
 			}
 			
 		}.execute();
-		Toast.makeText(context, R.string.aus__apk_file_start_valldate, Toast.LENGTH_LONG).show();
+		AppUpdateService.show(context, R.string.aus__apk_file_start_valldate, Toast.LENGTH_LONG);
 	}
 	
 	public static void installAPK(ContextWrapper wrapper, File apk) {
 		log.info("installAPK : " + apk.getAbsolutePath());
 		Context context = wrapper.getContext();
-		Toast.makeText(context, R.string.aus__start_install, Toast.LENGTH_LONG).show();
+		AppUpdateService.show(context, R.string.aus__start_install, Toast.LENGTH_LONG);
 		wrapper.getConfiguration().getInstallExecutor().install(context, apk);
 	}
 	
