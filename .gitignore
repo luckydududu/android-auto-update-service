@@ -33,3 +33,13 @@ proguard/
 /source/.project
 /source/.settings
 /library/.settings
+/sample/.settings
+/sample/bin
+/sample/build
+/sample/gen
+/library/build
+/library/gen
+/library/.settings
+/library/bin
+/build
+/.gradle
