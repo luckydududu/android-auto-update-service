@@ -4,6 +4,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
+groupId = "com.yepstudio.android.library"
+artifactId = "autoupdate"
+version = "1.0.1"
+
 android {
     compileSdkVersion 10
     buildToolsVersion "20.0.0"
@@ -43,5 +47,17 @@ android {
         // by a similar customization.
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
+    }
+}
+
+apply plugin: 'maven'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+       		maven {
+		        flatDir(dirs: file('jarsDerectory')) 
+		        artifactUrls "http://repo.xx.com/jars"
+    		}
+        }
     }
 }

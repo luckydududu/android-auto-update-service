@@ -5,6 +5,10 @@ dependencies {
 	compile project(':library')
 }
 
+groupId = "com.yepstudio.android.sample"
+artifactId = "autoupdate"
+version = "1.0.1"
+
 android {
     compileSdkVersion 10
     buildToolsVersion "20.0.0"
@@ -46,4 +50,15 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+}
+
+
+apply plugin: 'maven' 
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			mavenLocal()
+		}
+	}
 }
