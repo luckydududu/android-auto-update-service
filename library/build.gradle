@@ -34,28 +34,9 @@ android {
 
 dependencies {
     //compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:21.0.3'
-	compile 'org.slf4j:slf4j-api:1.7.6'
+    compile 'com.android.support:support-v4:21.0.+'
+	compile 'org.slf4j:slf4j-api:1.7.+'
 }
 
 
-apply plugin: 'maven'
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://D:/repositories/")
-            pom.version = '1.1.0'
-            pom.groupId = 'com.yepstudio.android.library'
-            pom.artifactId = 'autoupdate'
-			pom.project {
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-            }
-        }
-    }
-}
+apply from: '../maven_push.gradle'
