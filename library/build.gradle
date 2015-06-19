@@ -35,8 +35,8 @@ android {
 dependencies {
     //compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:21.0.+'
-	compile 'org.slf4j:slf4j-api:1.7.+'
+    provided 'org.slf4j:slf4j-api:1.7.+'
 }
 
+apply from: 'https://raw.githubusercontent.com/zzljob/gradle-publish/master/bintray.gradle'
 
-apply from: '../maven_push.gradle'

@@ -47,3 +47,4 @@ proguard/
 /.gradle
 /build
 /sample/.settings
+/sample/build
