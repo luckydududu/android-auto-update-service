@@ -1,0 +1,78 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = PROJ_GROUPID
+version = PROJ_VERSION
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging PROJ_PACKAGING
+                groupId PROJ_GROUPID
+                artifactId PROJ_ARTIFACTID
+
+                // Add your description here
+                name PROJ_NAME
+                description PROJ_DESCRIPTION
+                url PROJ_WEBSITEURL
+
+                // Set your license
+                licenses {
+                    license {
+                        name LICENSE_NAME
+                        url LICENSE_URL
+                        distribution LICENSE_DISTRIBUTION
+                        comments LICENSE_COMMENTS
+                    }
+                }
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+                scm {
+                    connection PROJ_VCSURL
+                    developerConnection PROJ_VCSURL
+                    url PROJ_WEBSITEURL
+                }
+            }
+        }
+    }
+}
+
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += configurations.compile
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+        linksOffline 'http://d.android.come/reference', '${sdkDir}/docs/reference'
+        title PROJ_ARTIFACTID
+    }
+    failOnError false
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}

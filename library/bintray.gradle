@@ -1,0 +1,20 @@
+apply plugin: 'com.jfrog.bintray'
+
+bintray {
+    user = BINTRAY_USER
+    key = BINTRAY_KEY
+
+    configurations = ['archives']
+    publish = true
+
+    pkg {
+        repo = PROJ_REPO
+        name = PROJ_NAME
+        desc = PROJ_DESCRIPTION
+        websiteUrl = PROJ_WEBSITEURL
+        issueTrackerUrl = PROJ_ISSUETRACKERURL
+        vcsUrl = PROJ_VCSURL
+        licenses = PROJ_LICENSES
+        publicDownloadNumbers = true
+    }
+}
