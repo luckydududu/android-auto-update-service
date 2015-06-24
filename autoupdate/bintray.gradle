@@ -5,6 +5,7 @@ bintray {
     key = BINTRAY_KEY
 
     configurations = ['archives']
+
     publish = true
 
     pkg {
@@ -14,7 +15,7 @@ bintray {
         websiteUrl = PROJ_WEBSITEURL
         issueTrackerUrl = PROJ_ISSUETRACKERURL
         vcsUrl = PROJ_VCSURL
-        licenses = PROJ_LICENSES
+        licenses = ['Apache-2.0']
         publicDownloadNumbers = true
     }
 }

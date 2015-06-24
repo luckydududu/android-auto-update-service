@@ -48,3 +48,4 @@ proguard/
 /build
 /sample/.settings
 /sample/build
+/autoupdate/build

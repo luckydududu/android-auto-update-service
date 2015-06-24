@@ -2,6 +2,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 group = PROJ_GROUPID
 version = PROJ_VERSION
+project.archivesBaseName = PROJ_ARTIFACTID
 
 install {
     repositories.mavenInstaller {
